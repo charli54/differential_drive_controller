@@ -2,7 +2,7 @@
 
 	<arg name="model" default="$(find differential_drive_controller)/urdf/robot.urdf.xacro"/>
 	
-	<arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" />
+	<arg name="rvizconfig" default="$(find differential_drive_controller)/rviz/urdf.rviz" />
 
 	<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
 	
