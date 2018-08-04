@@ -1,0 +1,23 @@
+<launch>
+
+	<arg name="model" default="$(find differential_drive_controller)/urdf/robot.urdf.xacro"/>
+	
+	<arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" />
+
+	<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+	
+	<rosparam file="$(find differential_drive_controller)/config/differential_drive_config.yaml" command="load"/>
+
+	<node name="controller_node" pkg="differential_drive_controller" type="differential_drive_controller_node" output="screen" />
+
+	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" 
+		args="
+			joint_state_controller
+			sample_robot_diff_drv
+		"/>
+<!-- ********************** CONTROL DU ROBOT *****************-->
+	<node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
+    	<param name="default_topic" value="/sample_robot_diff_drv/cmd_vel"/>
+  	</node>
+
+</launch>

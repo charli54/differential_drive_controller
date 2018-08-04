@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<robot name="simpleRobot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+	<xacro:property name="width" value="0.25"/>
+
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="${width} 0.2 0.02"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name="avant">
+    <visual>
+      <geometry>
+        <cylinder length="0.02" radius="0.125"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_avant" type="fixed">
+    <parent link="base_link"/>
+    <child link="avant"/>
+    <origin xyz="0 0.1 0"/>
+  </joint>
+
+  <link name="arriere">
+    <visual>
+      <geometry>
+        <cylinder length="0.02" radius="0.125"/>
+      </geometry>
+      
+    </visual>
+  </link>
+
+  <joint name="base_to_arriere" type="fixed">
+    <parent link="base_link"/>
+    <child link="arriere"/>
+    <origin xyz="0 -0.1 0"/>
+  </joint>
+
+  <link name="roue_gauche">
+    <visual>
+      <geometry>
+        <cylinder length="0.015" radius="0.06"/>
+      </geometry>
+      <origin rpy="0 1.5708 0" xyz="-0.0075 0 0"/>
+      <material name="white"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_roue_gauche" type="continuous">
+    <parent link="base_link"/>
+    <child link="roue_gauche"/>
+    <origin xyz="-0.125 0 0"/>
+  </joint>
+
+  <link name="roue_droite">
+    <visual>
+      <geometry>
+        <cylinder length="0.015" radius="0.06"/>
+      </geometry>
+      <origin rpy="0 1.5708 0" xyz="0.0075 0 0"/>
+      <material name="white"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_roue_droite" type="continious">
+    <parent link="base_link"/>
+    <child link="roue_droite"/>
+    <origin xyz="0.125 0 0"/>
+  </joint>
+</robot>

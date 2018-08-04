@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<robot name="first_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+	<xacro:property name="width" value="0.25"/>
+  <xacro:property name="wheelspacing" value="0.3" />
+  <xacro:property name="wheelradius" value="0.03" />
+  <xacro:property name="wheelwidth" value="0.015" />
+  <xacro:property name="smallwheelradius" value="0.02" />
+  <xacro:property name="smallwheelwidth" value="0.03" />
+
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+
+  <xacro:macro name="default_inertial" params="mass">
+    <inertial>
+      <mass value="${mass}" />
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1" />
+    </inertial>
+  </xacro:macro>
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="${width} 0.2 0.02"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${width} 0.2 0.02"/>
+      </geometry>
+    </collision>
+    <xacro:default_inertial mass="2" />
+  </link>
+
+  <xacro:macro name="base" params="prefix reflect">
+
+    <link name="${prefix}">
+      <visual>
+        <geometry>
+          <cylinder length="0.02" radius="${width/2}"/>
+        </geometry>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="0.02" radius="${width/2}"/>
+        </geometry>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+      </collision>
+      <xacro:default_inertial mass="0.5" />
+    </link>
+
+    <joint name="base_to_${prefix}" type="fixed">
+      <parent link="base_link"/>
+      <child link="${prefix}"/>
+      <origin xyz="0 ${reflect*0.1} 0"/>
+    </joint>
+
+  </xacro:macro>
+
+  <xacro:base prefix="avant"  reflect="1"/>
+  <xacro:base prefix="arriere"  reflect="-1"/>
+
+
+  <xacro:macro name="wheel" params="prefix reflect">
+
+    <link name="roue_${prefix}">
+      <visual>
+        <geometry>
+          <cylinder length="${wheelwidth}" radius="${wheelradius}"/>
+        </geometry>
+        <origin rpy="0 1.5708 0" xyz="0 0 0"/>
+        <material name="white"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${wheelwidth}" radius="${wheelradius}"/>
+        </geometry>
+        <origin rpy="0 1.5708 0" xyz="0 0 0"/>
+        <material name="white"/>
+      </collision>
+      <xacro:default_inertial mass="0.5" />
+    </link>
+
+    <joint name="base_to_roue_${prefix}" type="continuous">
+      <parent link="base_link"/>
+      <child link="roue_${prefix}"/>
+      <origin xyz="${reflect*wheelspacing/2} 0 0"/>
+    </joint>
+
+  <transmission name="${prefix}_wheel_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="${prefix}_wheel_motor">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="base_to_roue_${prefix}">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+
+  </xacro:macro>
+  
+  <xacro:wheel prefix="droite"  reflect="1"/>
+  <xacro:wheel prefix="gauche"  reflect="-1"/>
+
+<!--************************************************************************-->
+<!-- AJOUT DE ROUES LIBRE EN AVANT ET EN ARRIERE POUR EVITER LE BASCULEMENT -->
+  <xacro:macro name="free-wheel" params="prefix reflect">
+
+    <link name="roue_libre-${prefix}">
+      <visual>
+        <geometry>
+          <cylinder length="${smallwheelwidth}" radius="${smallwheelradius}"/>
+        </geometry>
+        <origin rpy="0 1.5708 0" xyz="0 0 0"/>
+        <material name="white"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${smallwheelwidth}" radius="${smallwheelradius}"/>
+        </geometry>
+        <origin rpy="0 1.5708 0" xyz="0 0 0"/>
+        <material name="white"/>
+      </collision>
+      <xacro:default_inertial mass="0.5" />
+    </link>
+
+    <joint name="base_to_roue_${prefix}" type="continuous">
+      <parent link="base_link"/>
+      <child link="roue_libre-${prefix}"/>
+      <origin xyz="0 ${reflect*wheelspacing/2} -0.04"/>
+    </joint>
+
+  </xacro:macro>
+  
+  <xacro:free-wheel prefix="avant"  reflect="1"/>
+  <xacro:free-wheel prefix="arriere"  reflect="-1"/>
+
+
+<!-- GAZEBO PLUGIN -->  
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/</robotNamespace>
+    </plugin>
+  </gazebo>
+
+</robot>
